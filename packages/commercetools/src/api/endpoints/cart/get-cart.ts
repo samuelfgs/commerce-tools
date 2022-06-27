@@ -7,8 +7,8 @@ const getCart: CartEndpoint['handlers']['getCart'] = async ({
   res,
   config,
 }) => {
-  const activeCart = await getActiveCart(req, res, config.sdkFetch);
-  const data = activeCart ? normalizeCart(activeCart, config) : undefined;
+  const activeCart = await getActiveCart(req, res, config.sdkFetch)
+  const data = activeCart ? normalizeCart(activeCart, config) : undefined
   res.status(200).json({ data })
 }
 

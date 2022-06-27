@@ -27,7 +27,7 @@ export default function getAllPagesOperation({
     config?: Partial<CommercetoolsConfig>
     preview?: boolean
   } = {}): Promise<GetAllPagesResult> {
-    return { pages: [ ] }
+    return { pages: [] }
   }
 
   return getAllPages

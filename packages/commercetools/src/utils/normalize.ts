@@ -1,6 +1,6 @@
 import { ProductOption } from '../types/product'
 import { Category } from '../types/site'
-import { 
+import {
   ProductProjection,
   Image,
   ProductVariant,
@@ -10,39 +10,43 @@ import {
   TypedMoney,
   Customer,
   ShoppingList,
-  ProductData
+  ProductData,
 } from '@commercetools/platform-sdk'
 import { dedup, withoutNils } from './common'
 import { CommerceAPIConfig } from '@vercel/commerce/api'
-import getLocalizedString from './localized-string';
+import getLocalizedString from './localized-string'
 
-const currencyCode = "USD";
+const currencyCode = 'USD'
 
-const stringify = (value: any) => 
-  typeof value === "string" ? value : JSON.stringify(value)
-
+const stringify = (value: any) =>
+  typeof value === 'string' ? value : JSON.stringify(value)
 
 const money = (price: TypedMoney | undefined) => {
-  return price ? {
-    value: price.centAmount/100,
-    currencyCode: price.currencyCode,
-  } : {
-    value: -1.00, // error
-    currencyCode
-  }
+  return price
+    ? {
+        value: price.centAmount / 100,
+        currencyCode: price.currencyCode,
+      }
+    : {
+        value: -1.0, // error
+        currencyCode,
+      }
 }
 
-const normalizeProductOption = (
-  option: {
-    name: string,
-    value: string | string[]
-  }
-): ProductOption => ({
-  __typename: "MultipleChoiceOption",
+const normalizeProductOption = (option: {
+  name: string
+  value: string | string[]
+}): ProductOption => ({
+  __typename: 'MultipleChoiceOption',
   id: option.name,
   displayName: option.name,
-  values: dedup(Array.isArray(option.value) ? option.value : [option.value]).map(val => {
-    if (option.name.match(/colou?r/gi) && /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/i.test(val)) {
+  values: dedup(
+    Array.isArray(option.value) ? option.value : [option.value]
+  ).map((val) => {
+    if (
+      option.name.match(/colou?r/gi) &&
+      /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/i.test(val)
+    ) {
       return {
         label: stringify(val),
         hexColors: [val],
@@ -52,35 +56,38 @@ const normalizeProductOption = (
         label: stringify(val),
       }
     }
-  })
+  }),
 })
 
 const normalizeProductImages = (images: Image[]) =>
-  images.map(image => ({
+  images.map((image) => ({
     url: image.url,
-    ...(image.label ? { alt: image.label } : { }),
+    ...(image.label ? { alt: image.label } : {}),
     width: image.dimensions.w,
-    height: image.dimensions.h
+    height: image.dimensions.h,
   }))
 
 const normalizeProductVariant = (variant: ProductVariant) => {
   const price = money(
-    variant.prices?.find(price => price.value.currencyCode === currencyCode)?.value ??
-    variant.prices?.[0]?.value
-  ).value;
+    variant.prices?.find((price) => price.value.currencyCode === currencyCode)
+      ?.value ?? variant.prices?.[0]?.value
+  ).value
 
-  return ({
+  return {
     id: `${variant.id}`,
     name: `${variant.id}`,
-    sku: variant.sku ?? "",
+    sku: variant.sku ?? '',
     price,
-    options: variant.attributes?.map(attribute => normalizeProductOption({
-      name: attribute.name,
-      value: attribute.value.key
-    })) ?? [],
+    options:
+      variant.attributes?.map((attribute) =>
+        normalizeProductOption({
+          name: attribute.name,
+          value: attribute.value.key,
+        })
+      ) ?? [],
     requiresShipping: false,
     listPrice: price,
-  });
+  }
 }
 
 export const normalizeProduct = (
@@ -91,50 +98,48 @@ export const normalizeProduct = (
   name: getLocalizedString(product.name, config.locale)!,
   slug: getLocalizedString(product.slug, config.locale)!,
   path: `/${getLocalizedString(product.slug, config.locale!)}`,
-  description: getLocalizedString(product.description, config.locale) ?? "",
+  description: getLocalizedString(product.description, config.locale) ?? '',
   price: money(
     product.masterVariant.prices?.find(
-      price => price.value.currencyCode === currencyCode
+      (price) => price.value.currencyCode === currencyCode
     )?.value ?? product.masterVariant.prices?.[0]?.value
   ),
   images: normalizeProductImages(
-    withoutNils(
-      [...(
-        product.masterVariant.images 
-          ? product.masterVariant.images
-          : []
-      ),
-      ...product.variants.flatMap(
-          variant => variant.images
-        )
-      ]
-    )
+    withoutNils([
+      ...(product.masterVariant.images ? product.masterVariant.images : []),
+      ...product.variants.flatMap((variant) => variant.images),
+    ])
   ),
-  variants: [product.masterVariant, ...product.variants].map(normalizeProductVariant),
+  variants: [product.masterVariant, ...product.variants].map(
+    normalizeProductVariant
+  ),
   options: withoutNils([
-    ...(
-        product.masterVariant.attributes 
-          ? product.masterVariant.attributes
-          : []
-    ),
-    ...product.variants.flatMap(variant => variant.attributes)
-  ]).reduce(
-    (groupedAttributes, attribute) => {
-      const groupedAttribute = groupedAttributes.find(gAttr => gAttr.name === attribute.name);
-      if (groupedAttribute) {
-        groupedAttribute.value.push(stringify(attribute.value.key))
-      } else {
-        groupedAttributes.push({
-          name: attribute.name,
-          value: [stringify(attribute.value.key)]
-        })
-      }
-      return groupedAttributes;
-    }
-  , [] as {
-    name: string;
-    value: string[];
-  }[]).map(normalizeProductOption)
+    ...(product.masterVariant.attributes
+      ? product.masterVariant.attributes
+      : []),
+    ...product.variants.flatMap((variant) => variant.attributes),
+  ])
+    .reduce(
+      (groupedAttributes, attribute) => {
+        const groupedAttribute = groupedAttributes.find(
+          (gAttr) => gAttr.name === attribute.name
+        )
+        if (groupedAttribute) {
+          groupedAttribute.value.push(stringify(attribute.value.key))
+        } else {
+          groupedAttributes.push({
+            name: attribute.name,
+            value: [stringify(attribute.value.key)],
+          })
+        }
+        return groupedAttributes
+      },
+      [] as {
+        name: string
+        value: string[]
+      }[]
+    )
+    .map(normalizeProductOption),
 })
 
 const normalizeLineItem = (
@@ -145,16 +150,17 @@ const normalizeLineItem = (
   variantId: `${lineItem.variant.id}`,
   productId: lineItem.productId,
   name: getLocalizedString(lineItem.name, config.locale)!,
-  path: "",
+  path: '',
   quantity: lineItem.quantity,
   discounts: [],
   variant: normalizeProductVariant(lineItem.variant),
-  options: lineItem.variant.attributes?.map(attribute => ({
-    id: attribute.name,
-    name: attribute.name,
-    value: attribute.value.key
-  })) ?? [],
-});
+  options:
+    lineItem.variant.attributes?.map((attribute) => ({
+      id: attribute.name,
+      name: attribute.name,
+      value: attribute.value.key,
+    })) ?? [],
+})
 
 export const normalizeCart = (
   cart: CommercetoolsCart,
@@ -165,16 +171,15 @@ export const normalizeCart = (
   email: cart.customerEmail,
   createdAt: cart.createdAt,
   currency: {
-      code: currencyCode
+    code: currencyCode,
   },
-  taxesIncluded: cart.taxMode !== "Disabled",
-  lineItems: cart.lineItems.map(item => normalizeLineItem(item, config)),
+  taxesIncluded: cart.taxMode !== 'Disabled',
+  lineItems: cart.lineItems.map((item) => normalizeLineItem(item, config)),
   lineItemsSubtotalPrice: 0,
   subtotalPrice: money(cart.totalPrice).value,
   totalPrice: money(cart.totalPrice).value,
   discounts: [],
-
-});
+})
 
 export const normalizeCategory = (
   category: CommercetoolsCategory,
@@ -184,18 +189,19 @@ export const normalizeCategory = (
   name: getLocalizedString(category.name, config.locale)!,
   slug: getLocalizedString(category.slug, config.locale)!,
   path: `/${getLocalizedString(category.slug, config.locale)}`,
-});
+})
 
 export const normalizeCustomer = (customer: Customer) => ({
   firstName: customer.firstName,
   lastName: customer.lastName,
-  email: customer.email
+  email: customer.email,
 })
 
-export const normalizeWishlist = (wishlist: ShoppingList ) => ({
-  items: wishlist.lineItems?.map(item => ({
-    id: item.id,
-    product_id: item.productId,
-    variant_id: item.variantId!
-  })) ?? []
+export const normalizeWishlist = (wishlist: ShoppingList) => ({
+  items:
+    wishlist.lineItems?.map((item) => ({
+      id: item.id,
+      product_id: item.productId,
+      variant_id: item.variantId!,
+    })) ?? [],
 })

@@ -18,18 +18,19 @@ const login: LoginEndpoint['handlers']['login'] = async ({
     })
   }
   try {
-    const activeCart = await getActiveCart(req, res, config.sdkFetch);
-    await commerce.login({ 
-      variables: { 
-        email, 
-        password, 
-        cartId: activeCart && !activeCart.customerId ? activeCart.id : undefined
-      }, 
-      config, 
-      res
-    });
+    const activeCart = await getActiveCart(req, res, config.sdkFetch)
+    await commerce.login({
+      variables: {
+        email,
+        password,
+        cartId:
+          activeCart && !activeCart.customerId ? activeCart.id : undefined,
+      },
+      config,
+      res,
+    })
   } catch (error) {
-    removeCustomerCookie(res);
+    removeCustomerCookie(res)
     // Check if the email and password didn't match an existing account
     if (
       error instanceof FetcherError &&
@@ -51,4 +52,4 @@ const login: LoginEndpoint['handlers']['login'] = async ({
   res.status(200).json({ data: null })
 }
 
-export default login;
+export default login

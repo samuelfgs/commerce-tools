@@ -37,7 +37,7 @@ export default function getPageOperation({
     config?: Partial<CommercetoolsConfig>
     preview?: boolean
   }): Promise<T['data']> {
-    return { page: undefined };
+    return { page: undefined }
   }
 
   return getPage

@@ -1,4 +1,3 @@
-
 import { Cart, CartDraft } from '@commercetools/platform-sdk'
 import { ClientResponse } from '@commercetools/sdk-client-v2'
 import { FetcherOptions } from '@vercel/commerce/utils/types'
@@ -7,25 +6,25 @@ import { removeCartCookie, setCartId } from './cart-cookie'
 
 const createCart = async (
   res: NextApiResponse,
-  fetch: <T = any, B = Body>(options: FetcherOptions<B>) => Promise<T>,
+  fetch: <T = any, B = Body>(options: FetcherOptions<B>) => Promise<T>
 ) => {
   const draft: CartDraft = {
-    currency: "USD",
-    country: "US",
+    currency: 'USD',
+    country: 'US',
   }
 
   const cart = await fetch<ClientResponse<Cart>, CartDraft>({
-    query: "carts",
-    method: "post",
-    body: draft
-  });
+    query: 'carts',
+    method: 'post',
+    body: draft,
+  })
 
   if (!cart.body) {
-    removeCartCookie(res);
+    removeCartCookie(res)
   } else {
-    setCartId(res, cart.body.id);
+    setCartId(res, cart.body.id)
   }
-  return cart.body;
+  return cart.body
 }
 
-export default createCart;
+export default createCart

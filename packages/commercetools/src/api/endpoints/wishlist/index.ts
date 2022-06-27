@@ -13,7 +13,7 @@ export type WishlistEndpoint = WishlistAPI['endpoint']
 export const handlers: WishlistEndpoint['handlers'] = {
   getWishlist,
   addItem,
-  removeItem
+  removeItem,
 }
 
 const wishlistApi = createEndpoint<WishlistAPI>({

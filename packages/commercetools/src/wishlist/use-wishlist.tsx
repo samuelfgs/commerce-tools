@@ -10,9 +10,9 @@ export default useWishlist as UseWishlist<typeof handler>
 
 export const handler: SWRHook<GetWishlistHook> = {
   fetchOptions: {
-    url: "/api/wishlist",
+    url: '/api/wishlist',
     method: 'get',
-  },  
+  },
   async fetcher({ input: { includeProducts }, options, fetch }) {
     // Use a dummy base as we only care about the relative path
     const url = new URL(options.url!, 'http://a')
@@ -23,8 +23,8 @@ export const handler: SWRHook<GetWishlistHook> = {
       url: url.pathname + url.search,
       method: options.method,
     })
-    .then(response => response)
-    .catch(() => ({ items: []}))
+      .then((response) => response)
+      .catch(() => ({ items: [] }))
   },
   useHook:
     ({ useData }) =>

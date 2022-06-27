@@ -1,6 +1,11 @@
-import { getActiveCart, normalizeCart, removeCartCookie, setCartId } from '../../../utils'
+import {
+  getActiveCart,
+  normalizeCart,
+  removeCartCookie,
+  setCartId,
+} from '../../../utils'
 import type { CartEndpoint } from '.'
-import { Cart, CartUpdate, ClientResponse } from '@commercetools/platform-sdk';
+import { Cart, CartUpdate, ClientResponse } from '@commercetools/platform-sdk'
 
 const addItem: CartEndpoint['handlers']['addItem'] = async ({
   req,
@@ -8,11 +13,12 @@ const addItem: CartEndpoint['handlers']['addItem'] = async ({
   body: { item },
   config,
 }) => {
-  const activeCart = await getActiveCart(req, res, config.sdkFetch);
-  if ((
-    item.quantity &&
-    (!Number.isInteger(item.quantity) || item.quantity! < 1)
-  ) || !activeCart) {
+  const activeCart = await getActiveCart(req, res, config.sdkFetch)
+  if (
+    (item.quantity &&
+      (!Number.isInteger(item.quantity) || item.quantity! < 1)) ||
+    !activeCart
+  ) {
     return res.status(400).json({
       data: null,
       errors: [{ message: 'Invalid request' }],
@@ -22,27 +28,30 @@ const addItem: CartEndpoint['handlers']['addItem'] = async ({
     version: activeCart.version,
     actions: [
       {
-        action: "addLineItem",
+        action: 'addLineItem',
         variantId: +item.variantId,
         productId: item.productId,
-        quantity: item.quantity ?? 1
-    }]
+        quantity: item.quantity ?? 1,
+      },
+    ],
   }
   const updatedCart = await config.sdkFetch<ClientResponse<Cart>, CartUpdate>({
-    query: "carts",
-    method: "post",
+    query: 'carts',
+    method: 'post',
     variables: {
-      id: activeCart.id
+      id: activeCart.id,
     },
-    body: lineItem
-  });
+    body: lineItem,
+  })
 
   if (updatedCart.body) {
-    setCartId(res, updatedCart.body.id);
+    setCartId(res, updatedCart.body.id)
   } else {
-    removeCartCookie(res);
+    removeCartCookie(res)
   }
-  const data = updatedCart.body ? normalizeCart(updatedCart.body, config) : undefined;
+  const data = updatedCart.body
+    ? normalizeCart(updatedCart.body, config)
+    : undefined
   res.status(200).json({ data })
 }
 

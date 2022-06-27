@@ -1,38 +1,44 @@
 import { ShoppingList } from '@commercetools/platform-sdk'
 import { ClientResponse } from '@commercetools/sdk-client-v2'
 import { FetcherOptions } from '@vercel/commerce/utils/types'
-import { NextApiRequest, NextApiResponse } from 'next';
-import { getWishlistId, removeWishlistCookie, setWishlistCookie } from './wishlist-cookie';
-import createWishlist from './wishlist-create';
+import { NextApiRequest, NextApiResponse } from 'next'
+import {
+  getWishlistId,
+  removeWishlistCookie,
+  setWishlistCookie,
+} from './wishlist-cookie'
+import createWishlist from './wishlist-create'
 
 const getActiveCart = async (
   req: NextApiRequest,
   res: NextApiResponse,
-  fetch: <T = any, B = Body>(options: FetcherOptions<B>) => Promise<T>,
+  fetch: <T = any, B = Body>(options: FetcherOptions<B>) => Promise<T>
 ) => {
-  const wishlistId = getWishlistId(req);
-  let activeWishlist;
+  const wishlistId = getWishlistId(req)
+  let activeWishlist
   if (wishlistId) {
-    activeWishlist = (await fetch<ClientResponse<ShoppingList>>({
-      query: "shoppingLists",
-      method: "get",
-      variables: {
-        id: wishlistId
-      }
-    })).body
+    activeWishlist = (
+      await fetch<ClientResponse<ShoppingList>>({
+        query: 'shoppingLists',
+        method: 'get',
+        variables: {
+          id: wishlistId,
+        },
+      })
+    ).body
   } else {
-    activeWishlist = await createWishlist(res, fetch);
+    activeWishlist = await createWishlist(res, fetch)
   }
 
   if (!activeWishlist) {
-    removeWishlistCookie(res);
+    removeWishlistCookie(res)
   } else {
     setWishlistCookie(res, activeWishlist.id)
   }
   if (!activeWishlist) {
-    throw Error("Unknown Error");
+    throw Error('Unknown Error')
   }
-  return activeWishlist;
+  return activeWishlist
 }
 
-export default getActiveCart;
+export default getActiveCart

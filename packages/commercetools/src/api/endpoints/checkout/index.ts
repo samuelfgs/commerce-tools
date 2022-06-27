@@ -7,7 +7,7 @@ const getCheckout: CheckoutEndpoint['handlers']['getCheckout'] = async ({
   res,
   config,
 }) => {
-  const checkoutUrl = "";
+  const checkoutUrl = ''
 
   if (checkoutUrl) {
     res.redirect(checkoutUrl)

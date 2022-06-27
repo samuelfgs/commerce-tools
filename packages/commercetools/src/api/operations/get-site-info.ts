@@ -1,7 +1,10 @@
 import { CommercetoolsConfig, Provider } from '..'
 import type { OperationContext } from '@vercel/commerce/api/operations'
 import type { Category } from '@vercel/commerce/types/site'
-import { ClientResponse, CategoryPagedQueryResponse } from '@commercetools/platform-sdk'
+import {
+  ClientResponse,
+  CategoryPagedQueryResponse,
+} from '@commercetools/platform-sdk'
 import { normalizeCategory } from '../../utils'
 
 export type GetSiteInfoResult<
@@ -25,14 +28,18 @@ export default function getSiteInfoOperation({
   } = {}): Promise<GetSiteInfoResult> {
     const config = commerce.getConfig(cfg)
 
-    const categories = await config.fetcher<ClientResponse<CategoryPagedQueryResponse>>({
-      query: "categories",
-      method: "get"
+    const categories = await config.fetcher<
+      ClientResponse<CategoryPagedQueryResponse>
+    >({
+      query: 'categories',
+      method: 'get',
     })
-    
+
     return {
-      categories: categories.body.results.map(category => normalizeCategory(category, config)),
-      brands: []
+      categories: categories.body.results.map((category) =>
+        normalizeCategory(category, config)
+      ),
+      brands: [],
     }
   }
 

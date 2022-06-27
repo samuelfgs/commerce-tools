@@ -6,12 +6,9 @@ import type {
 import useRemoveItem, {
   UseRemoveItem,
 } from '@vercel/commerce/cart/use-remove-item'
-import type {
-  LineItem,
-  RemoveItemHook,
-} from '@vercel/commerce/types/cart'
+import type { LineItem, RemoveItemHook } from '@vercel/commerce/types/cart'
 import useCart from './use-cart'
-import { Cart } from '@commercetools/platform-sdk';
+import { Cart } from '@commercetools/platform-sdk'
 
 export type RemoveItemFn<T = any> = T extends LineItem
   ? (input?: RemoveItemActionInput<T>) => Promise<Cart | null | undefined>

@@ -31,7 +31,7 @@ export const handler = {
     if (Number.isInteger(item.quantity)) {
       // Also allow the update hook to remove an item if the quantity is lower than 1
       if (item.quantity! < 1) {
-        item.quantity = 0;
+        item.quantity = 0
       }
     } else if (item.quantity) {
       throw new ValidationError({

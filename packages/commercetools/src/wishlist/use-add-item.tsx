@@ -26,7 +26,7 @@ export const handler: MutationHook<AddItemHook> = {
               message: 'Signed customer not found',
             })
           }
-          const data = await fetch({ input: { item : input} })
+          const data = await fetch({ input: { item: input } })
           await mutate(data, false)
           return data
         },

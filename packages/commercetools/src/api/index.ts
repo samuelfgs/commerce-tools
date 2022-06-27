@@ -20,9 +20,9 @@ import getProduct from './operations/get-product'
 import { FetcherOptions } from '@vercel/commerce/utils/types'
 
 export interface CommercetoolsConfig extends CommerceAPIConfig {
-  fetcher: <T = any, B = Body>(options: FetcherOptions<B>) => Promise<T>,
-  wishlistCookie: string,
-  sdkFetch: <T = any, B = Body>(options: FetcherOptions<B>) => Promise<T>,
+  fetcher: <T = any, B = Body>(options: FetcherOptions<B>) => Promise<T>
+  wishlistCookie: string
+  sdkFetch: <T = any, B = Body>(options: FetcherOptions<B>) => Promise<T>
 }
 
 const config: CommercetoolsConfig = {
@@ -32,10 +32,10 @@ const config: CommercetoolsConfig = {
   cartCookie: COMMERCETOOLS_CART_COOKIE,
   cartCookieMaxAge: COMMERCETOOLS_COOKIE_EXPIRE,
   wishlistCookie: COMMERCETOOLS_WISHLIST_COOKIE,
-  fetch: { } as any,
+  fetch: {} as any,
   fetcher,
   sdkFetch: fetcher,
-  customerCookie: "",
+  customerCookie: '',
 }
 
 const operations = {

@@ -7,8 +7,8 @@ export default useCart as UseCart<typeof handler>
 
 export const handler: SWRHook<GetCartHook> = {
   fetchOptions: {
-    url: "/api/cart",
-    method: "get",
+    url: '/api/cart',
+    method: 'get',
   },
   async fetcher({ input, options, fetch }) {
     const data = await fetch({

@@ -1,10 +1,8 @@
 import { Fetcher } from '@vercel/commerce/utils/types'
 import client from './commercetools'
-import {
-  createApiBuilderFromCtpClient,
-} from '@commercetools/platform-sdk';
-import { COMMERCETOOLS_PROJECT_KEY } from './const';
-import { FetcherError } from '@vercel/commerce/utils/errors';
+import { createApiBuilderFromCtpClient } from '@commercetools/platform-sdk'
+import { COMMERCETOOLS_PROJECT_KEY } from './const'
+import { FetcherError } from '@vercel/commerce/utils/errors'
 
 async function getText(res: Response) {
   try {
@@ -44,79 +42,70 @@ export const clientFetcher: Fetcher = async ({
 }
 
 const sdkFetcher: Fetcher = async ({ method, variables, query, body }) => {
-  const apiRoot = createApiBuilderFromCtpClient(client.client)
-    .withProjectKey({projectKey: COMMERCETOOLS_PROJECT_KEY! })
+  const apiRoot = createApiBuilderFromCtpClient(client.client).withProjectKey({
+    projectKey: COMMERCETOOLS_PROJECT_KEY!,
+  })
 
-  if (query === "login") {
+  if (query === 'login') {
     return apiRoot
       .login()
       .post({
-        body
+        body,
       })
       .execute()
-      .then(response => response)
-      .catch(response => {
+      .then((response) => response)
+      .catch((response) => {
         throw new FetcherError({
-        status: response.statusCode,
-        message: response.body.message
-      })});
-  } else if (query === "productProjections") {
-    const initialQueryBuilder = apiRoot
-      [query]()
+          status: response.statusCode,
+          message: response.body.message,
+        })
+      })
+  } else if (query === 'productProjections') {
+    const initialQueryBuilder = apiRoot[query]()
 
     const queryBuilderWithId = variables?.id
       ? initialQueryBuilder.withId({ ID: variables.id })
       : initialQueryBuilder.search()
 
-    return await queryBuilderWithId
-      [method as "get"]({
-        queryArgs: {
-          expand: variables?.expand,
-          limit: variables?.limit,
-          ...(variables?.sort 
-            ? { sort: variables.sort }
-            : {}
-          ),
-          ...(variables?.search 
-            ? variables.search
-            : { }
-          ),
-          ...(variables?.filters
-            ? { filter: variables.filters }
-            : { }  
-          )
-        }
-      }).execute()
-      .then(response => response)
-      .catch(response => {
+    return await queryBuilderWithId[method as 'get']({
+      queryArgs: {
+        expand: variables?.expand,
+        limit: variables?.limit,
+        ...(variables?.sort ? { sort: variables.sort } : {}),
+        ...(variables?.search ? variables.search : {}),
+        ...(variables?.filters ? { filter: variables.filters } : {}),
+      },
+    })
+      .execute()
+      .then((response) => response)
+      .catch((response) => {
         throw new FetcherError({
-        status: response.statusCode,
-        message: response.body.message
-      })});
+          status: response.statusCode,
+          message: response.body.message,
+        })
+      })
   } else {
-    const initialQueryBuilder = 
-        apiRoot[query as "categories" | "carts" | "products" | "customers"]()
+    const initialQueryBuilder =
+      apiRoot[query as 'categories' | 'carts' | 'products' | 'customers']()
 
     const queryBuilderWithId = variables?.id
       ? initialQueryBuilder.withId({ ID: variables.id })
       : initialQueryBuilder
-    
-    return await queryBuilderWithId
-      [method as "post" | "get"]({
-        body,
-        queryArgs: {
-          ...(variables?.where 
-            ? { where: variables.where }  
-            : { }
-          )
-        }
-      }).execute()
-      .then(response => response)
-      .catch(response => {
+
+    return await queryBuilderWithId[method as 'post' | 'get']({
+      body,
+      queryArgs: {
+        ...(variables?.where ? { where: variables.where } : {}),
+      },
+    })
+      .execute()
+      .then((response) => response)
+      .catch((response) => {
         throw new FetcherError({
-        status: response.statusCode,
-        message: response.body.message
-      })});
+          status: response.statusCode,
+          message: response.body.message,
+        })
+      })
   }
 }
 

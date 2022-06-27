@@ -5,7 +5,7 @@ const logout: LogoutEndpoint['handlers']['logout'] = async ({
   res,
   body: { redirectTo },
 }) => {
-  removeCustomerCookie(res);
+  removeCustomerCookie(res)
   // Only allow redirects to a relative URL
   if (redirectTo?.startsWith('/')) {
     res.redirect(redirectTo)

@@ -2,7 +2,10 @@ import { normalizeProduct } from '../../utils/normalize'
 import { GetAllProductsOperation } from '@vercel/commerce/types/product'
 import { Provider, CommercetoolsConfig } from '..'
 import { OperationContext } from '@vercel/commerce/api/operations'
-import { ClientResponse, ProductProjectionPagedQueryResponse } from '@commercetools/platform-sdk'
+import {
+  ClientResponse,
+  ProductProjectionPagedQueryResponse,
+} from '@commercetools/platform-sdk'
 
 export type ProductVariables = { first?: number }
 
@@ -18,17 +21,25 @@ export default function getAllProductsOperation({
     config?: Partial<CommercetoolsConfig>
     preview?: boolean
   } = {}): Promise<T['data']> {
-    const config = commerce.getConfig(cfg);
+    const config = commerce.getConfig(cfg)
 
-    const products = await config.sdkFetch<ClientResponse<ProductProjectionPagedQueryResponse>>({
-      query: "productProjections",
-      method: "get",
+    const products = await config.sdkFetch<
+      ClientResponse<ProductProjectionPagedQueryResponse>
+    >({
+      query: 'productProjections',
+      method: 'get',
       variables: {
-        limit: variables.first
-      }
-    });
-    
-    return { products: products.body ? products.body.results.map(product => normalizeProduct(product, config)) : [] };
+        limit: variables.first,
+      },
+    })
+
+    return {
+      products: products.body
+        ? products.body.results.map((product) =>
+            normalizeProduct(product, config)
+          )
+        : [],
+    }
   }
 
   return getAllProducts

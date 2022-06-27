@@ -1,6 +1,10 @@
 import type { WishlistEndpoint } from '.'
 import { getActiveWishlist, normalizeWishlist } from '../../../utils'
-import { ShoppingList, ShoppingListUpdate, ClientResponse } from '@commercetools/platform-sdk';
+import {
+  ShoppingList,
+  ShoppingListUpdate,
+  ClientResponse,
+} from '@commercetools/platform-sdk'
 
 // Return wishlist info
 const removeItem: WishlistEndpoint['handlers']['removeItem'] = async ({
@@ -9,7 +13,7 @@ const removeItem: WishlistEndpoint['handlers']['removeItem'] = async ({
   body: { itemId },
   config,
 }) => {
-  const activeWishlist = await getActiveWishlist(req, res, config.sdkFetch);
+  const activeWishlist = await getActiveWishlist(req, res, config.sdkFetch)
   if (!activeWishlist || !itemId) {
     return res.status(400).json({
       data: null,
@@ -21,21 +25,26 @@ const removeItem: WishlistEndpoint['handlers']['removeItem'] = async ({
     version: activeWishlist.version,
     actions: [
       {
-        action: "removeLineItem",
-        lineItemId: itemId
-      }
-    ]
+        action: 'removeLineItem',
+        lineItemId: itemId,
+      },
+    ],
   }
-  const updatedWishlist = await config.sdkFetch<ClientResponse<ShoppingList>, ShoppingListUpdate>({
-    query: "shoppingLists",
-    method: "post",
+  const updatedWishlist = await config.sdkFetch<
+    ClientResponse<ShoppingList>,
+    ShoppingListUpdate
+  >({
+    query: 'shoppingLists',
+    method: 'post',
     variables: {
-      id: activeWishlist.id
+      id: activeWishlist.id,
     },
-    body: lineItem
-  });
+    body: lineItem,
+  })
 
-  const data = updatedWishlist.body ? normalizeWishlist(updatedWishlist.body) : null;
+  const data = updatedWishlist.body
+    ? normalizeWishlist(updatedWishlist.body)
+    : null
   res.status(200).json({ data })
 }
 

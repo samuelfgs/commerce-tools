@@ -35,6 +35,6 @@ export const handler: MutationHook<RemoveItemHook> = {
           return data
         },
         [fetch, mutate, customer]
-      )    
+      )
     },
 }
