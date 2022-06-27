@@ -28,7 +28,7 @@ export default function getAllProductsOperation({
       }
     });
     
-    return { products: products.body ? products.body.results.map(normalizeProduct) : [] };
+    return { products: products.body ? products.body.results.map(product => normalizeProduct(product, config)) : [] };
   }
 
   return getAllProducts

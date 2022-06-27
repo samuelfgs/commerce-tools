@@ -39,7 +39,7 @@ const removeItem: CartEndpoint['handlers']['removeItem'] = async ({
     removeCartCookie(res);
   }
 
-  const data = updatedCart.body ? normalizeCart(updatedCart.body) : undefined;
+  const data = updatedCart.body ? normalizeCart(updatedCart.body, config) : undefined;
   res.status(200).json({ data })
 }
 

@@ -1,7 +1,6 @@
 import { ProductsEndpoint } from '.'
 import { ClientResponse, ProductProjectionPagedQueryResponse } from '@commercetools/platform-sdk'
 import { getSortVariables, normalizeProduct } from '../../../../utils';
-import { getLocale } from '../../../../utils';
 
 const getProducts: ProductsEndpoint['handlers']['getProducts'] = async ({
   res,
@@ -16,7 +15,7 @@ const getProducts: ProductsEndpoint['handlers']['getProducts'] = async ({
       expand: ["masterData.current"],
       sort: getSortVariables(sort),
       ...(search
-        ? { search: { [`text.${getLocale(config)}`]: search } }
+        ? { search: { [`text.${config.locale!}`]: search } }
         : { }
       ),
       ...(categoryId 
@@ -28,7 +27,7 @@ const getProducts: ProductsEndpoint['handlers']['getProducts'] = async ({
 
   const data = {
     products: response.body.results.map((product) =>
-      normalizeProduct(product)
+      normalizeProduct(product, config)
     ),
     found: response.body.count > 0
   }

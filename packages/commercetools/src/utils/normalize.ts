@@ -13,8 +13,9 @@ import {
   ProductData
 } from '@commercetools/platform-sdk'
 import { dedup, withoutNils } from './common'
+import { CommerceAPIConfig } from '@vercel/commerce/api'
+import getLocalizedString from './localized-string';
 
-const locale = "en";
 const currencyCode = "USD";
 
 const stringify = (value: any) => 
@@ -40,9 +41,18 @@ const normalizeProductOption = (
   __typename: "MultipleChoiceOption",
   id: option.name,
   displayName: option.name,
-  values: dedup(Array.isArray(option.value) ? option.value : [option.value]).map(val => ({
-    label: stringify(val)
-  }))
+  values: dedup(Array.isArray(option.value) ? option.value : [option.value]).map(val => {
+    if (option.name.match(/colou?r/gi) && /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/i.test(val)) {
+      return {
+        label: stringify(val),
+        hexColors: [val],
+      }
+    } else {
+      return {
+        label: stringify(val),
+      }
+    }
+  })
 })
 
 const normalizeProductImages = (images: Image[]) =>
@@ -64,20 +74,24 @@ const normalizeProductVariant = (variant: ProductVariant) => {
     name: `${variant.id}`,
     sku: variant.sku ?? "",
     price,
-    options: variant.attributes?.map(attribute => normalizeProductOption(attribute)) ?? [],
+    options: variant.attributes?.map(attribute => normalizeProductOption({
+      name: attribute.name,
+      value: attribute.value.key
+    })) ?? [],
     requiresShipping: false,
     listPrice: price,
   });
 }
 
 export const normalizeProduct = (
-  product: ProductProjection | (ProductData & { id: string })
+  product: ProductProjection | (ProductData & { id: string }),
+  config: CommerceAPIConfig
 ) => ({
   id: product.id,
-  name: product.name[locale],
-  slug: product.slug[locale],
-  path: `/${product.slug[locale]}`,
-  description: product.description?.[locale] ?? "",
+  name: getLocalizedString(product.name, config.locale)!,
+  slug: getLocalizedString(product.slug, config.locale)!,
+  path: `/${getLocalizedString(product.slug, config.locale!)}`,
+  description: getLocalizedString(product.description, config.locale) ?? "",
   price: money(
     product.masterVariant.prices?.find(
       price => price.value.currencyCode === currencyCode
@@ -100,7 +114,7 @@ export const normalizeProduct = (
   options: withoutNils([
     ...(
         product.masterVariant.attributes 
-          ? product.masterVariant.attributes 
+          ? product.masterVariant.attributes
           : []
     ),
     ...product.variants.flatMap(variant => variant.attributes)
@@ -108,11 +122,11 @@ export const normalizeProduct = (
     (groupedAttributes, attribute) => {
       const groupedAttribute = groupedAttributes.find(gAttr => gAttr.name === attribute.name);
       if (groupedAttribute) {
-        groupedAttribute.value.push(stringify(attribute.value))
+        groupedAttribute.value.push(stringify(attribute.value.key))
       } else {
         groupedAttributes.push({
           name: attribute.name,
-          value: [stringify(attribute.value)]
+          value: [stringify(attribute.value.key)]
         })
       }
       return groupedAttributes;
@@ -124,12 +138,13 @@ export const normalizeProduct = (
 })
 
 const normalizeLineItem = (
-  lineItem: CommercetoolsLineItem
+  lineItem: CommercetoolsLineItem,
+  config: CommerceAPIConfig
 ) => ({
   id: lineItem.id,
   variantId: `${lineItem.variant.id}`,
   productId: lineItem.productId,
-  name: lineItem.name[locale],
+  name: getLocalizedString(lineItem.name, config.locale)!,
   path: "",
   quantity: lineItem.quantity,
   discounts: [],
@@ -137,12 +152,13 @@ const normalizeLineItem = (
   options: lineItem.variant.attributes?.map(attribute => ({
     id: attribute.name,
     name: attribute.name,
-    value: stringify(attribute.value)
+    value: attribute.value.key
   })) ?? [],
 });
 
 export const normalizeCart = (
-  cart: CommercetoolsCart
+  cart: CommercetoolsCart,
+  config: CommerceAPIConfig
 ) => ({
   id: cart.id,
   customerId: cart.customerId,
@@ -152,7 +168,7 @@ export const normalizeCart = (
       code: currencyCode
   },
   taxesIncluded: cart.taxMode !== "Disabled",
-  lineItems: cart.lineItems.map(normalizeLineItem),
+  lineItems: cart.lineItems.map(item => normalizeLineItem(item, config)),
   lineItemsSubtotalPrice: 0,
   subtotalPrice: money(cart.totalPrice).value,
   totalPrice: money(cart.totalPrice).value,
@@ -160,11 +176,14 @@ export const normalizeCart = (
 
 });
 
-export const normalizeCategory = (category: CommercetoolsCategory): Category => ({
+export const normalizeCategory = (
+  category: CommercetoolsCategory,
+  config: CommerceAPIConfig
+): Category => ({
   id: category.id,
-  name: category.name[locale],
-  slug: category.slug[locale],
-  path: `/${category.slug[locale]}`,
+  name: getLocalizedString(category.name, config.locale)!,
+  slug: getLocalizedString(category.slug, config.locale)!,
+  path: `/${getLocalizedString(category.slug, config.locale)}`,
 });
 
 export const normalizeCustomer = (customer: Customer) => ({

@@ -4,7 +4,7 @@ export { default as createCart } from "./cart-create"
 export { default as getActiveCart } from "./cart-active"
 export { default as createWishlist } from "./wishlist-create"
 export { default as getActiveWishlist } from "./wishlist-active"
-export { default as getLocale } from "./get-locale"
+export { default as getLocalizedString } from "./localized-string"
 
 export * from './normalize'
 export * from "./common"

@@ -26,7 +26,7 @@ export interface CommercetoolsConfig extends CommerceAPIConfig {
 }
 
 const config: CommercetoolsConfig = {
-  locale: 'en',
+  locale: 'en-US',
   commerceUrl: '',
   apiToken: '',
   cartCookie: COMMERCETOOLS_CART_COOKIE,

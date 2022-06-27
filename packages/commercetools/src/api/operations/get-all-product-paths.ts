@@ -4,7 +4,7 @@ import {
 } from '@vercel/commerce/api/operations'
 import { GetAllProductPathsOperation } from '@vercel/commerce/types/product'
 import { ClientResponse, ProductProjectionPagedQueryResponse } from '@commercetools/platform-sdk'
-import { getLocale } from '../../utils'
+import { getLocalizedString } from '../../utils'
 
 export default function getAllProductPathsOperation({
   commerce,
@@ -25,7 +25,7 @@ export default function getAllProductPathsOperation({
 
     return {
       products: response.body.results?.map(product => ({
-        path: `/${product.slug[getLocale(config)!]}`,
+        path: `/${getLocalizedString(product.slug, config.locale)}`,
       })),
     }
   }

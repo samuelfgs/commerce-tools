@@ -20,14 +20,14 @@ export default function getProductOperation({
       query: "products",
       method: "get",
       variables: {
-        where: `masterData(current(slug(${"en"}="${variables.slug}")))`
+        where: `masterData(current(slug(en-US="${variables.slug}")))`
       }
     });
     const data = product.body.count > 0 
       ? normalizeProduct({
           ...product.body.results[0].masterData.current,
           id: product.body.results[0].id
-        }) 
+        }, config) 
       : undefined;
     return {
       product: data

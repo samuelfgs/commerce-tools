@@ -45,7 +45,7 @@ const getWishlist: WishlistEndpoint['handlers']['getWishlist'] = async ({
         product: normalizeProduct({
           ...products?.find(product => product.id === item.product_id)?.masterData.current!,
           id: item.product_id
-        })
+        }, config)
       }))
     }
   })

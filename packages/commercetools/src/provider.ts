@@ -20,7 +20,7 @@ import { clientFetcher } from './fetcher'
 import { COMMERCETOOLS_CART_COOKIE } from './const'
 
 export const commercetoolsProvider: Provider = {
-  locale: 'en',
+  locale: 'en-US',
   cartCookie: COMMERCETOOLS_CART_COOKIE,
   fetcher: clientFetcher,
   cart: { useCart, useAddItem, useUpdateItem, useRemoveItem },

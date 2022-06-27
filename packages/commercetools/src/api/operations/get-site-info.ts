@@ -31,7 +31,7 @@ export default function getSiteInfoOperation({
     })
     
     return {
-      categories: categories.body.results.map(normalizeCategory),
+      categories: categories.body.results.map(category => normalizeCategory(category, config)),
       brands: []
     }
   }
