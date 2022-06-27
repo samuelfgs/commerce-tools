@@ -1,4 +1,5 @@
 {
+  "provider": "commercetools",
   "features": {
     "cart": true,
     "search": true,
